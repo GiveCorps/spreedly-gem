@@ -1,6 +1,6 @@
-module FindTransactionTranscriptStubs
+module FindTranscriptStubs
 
-  def successful_get_transaction_transcript_response
+  def successful_get_transcript_response
     StubResponse.succeeded <<-TEXT
    opening connection to api-aa.paypal.com...
     opened
