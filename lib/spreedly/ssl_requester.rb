@@ -2,19 +2,19 @@ module Spreedly
 
   module SslRequester
 
-    def ssl_get(endpoint, headers = {})
+    def ssl_get(endpoint, headers)
       ssl_request(:get, endpoint, nil, headers)
     end
 
-    def ssl_raw_get(endpoint, headers = {})
-      ssl_request(:get, endpoint, nil, headers, true)
-    end    
-
-    def ssl_post(endpoint, body, headers = {})
-      ssl_request(:post, endpoint, body, headers)
+    def ssl_post(endpoint, body, headers, talking_to_gateway = false)
+      ssl_request(:post, endpoint, body, headers, talking_to_gateway: talking_to_gateway)
     end
 
-    def ssl_put(endpoint, body, headers = {})
+    def ssl_raw_get(endpoint, headers)
+      ssl_request(:get, endpoint, nil, headers, return_raw: true)
+    end
+
+    def ssl_put(endpoint, body, headers)
       ssl_request(:put, endpoint, body, headers)
     end
 
@@ -23,13 +23,16 @@ module Spreedly
     end
 
     private
-    def ssl_request(method, endpoint, body, headers, return_raw = false)
-      raw_response = Timeout::timeout(70) do
+    def ssl_request(method, endpoint, body, headers, options = {})
+      opts = { talking_to_gateway: false, return_raw: false }.merge(options)
+      how_long = opts[:talking_to_gateway] ? 66 : 10
+
+      raw_response = Timeout::timeout(how_long) do
         raw_ssl_request(method, endpoint, body, headers)
       end
 
       show_raw_response(raw_response)
-      handle_response(raw_response, return_raw)
+      handle_response(raw_response, opts[:return_raw])
 
     rescue Timeout::Error => e
       raise Spreedly::TimeoutError.new
@@ -40,14 +43,10 @@ module Spreedly
       connection.request(method, body, headers)
     end
 
-    def handle_response(response, return_raw = false)
+    def handle_response(response, return_raw)
       case response.code.to_i
       when 200...300
-        if return_raw
-          response.body
-        else
-          xml_doc(response)
-        end
+        return_raw ? response.body : xml_doc(response)
       when 401
         raise AuthenticationError.new(xml_doc(response))
       when 404

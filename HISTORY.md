@@ -1,5 +1,23 @@
 # Changelog
 
+## 2.0.7
+* Add support for company_name to gateway options [duff]
+* Implemented gateway characteristics [ilyutov]
+* Allow access to gateway options w/o credentials [duff]
+
+## 2.0.6
+* Add auth_mode support to gateway options call [sosedoff]
+* Pass through verification_value when creating a card directly [duff]
+
+## 2.0.5
+* Add ability to retrieve a transcript [hoenth]
+
+## 2.0.3
+* Readme improvements
+* Smarter about timeouts - now only have long timeout for calls
+  that actually talk to a payment gateway.  The other calls can
+  have shorter timeouts.
+
 ## 2.0.2
 * Add support for gateway options call.
 

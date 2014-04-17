@@ -29,8 +29,8 @@ module Spreedly
       Transaction.new_from(xml_doc)
     end
 
-    def find_transaction_transcript(token)
-      xml_doc = ssl_raw_get(find_transaction_transcript_url(token), headers)
+    def find_transcript(transaction_token)
+      ssl_raw_get(find_transcript_url(transaction_token), headers)
     end
 
     def find_gateway(token)
@@ -96,6 +96,10 @@ module Spreedly
       GatewayClass.new_list_from(xml_doc)
     end
 
+    def self.gateway_options
+      self.new("", "").gateway_options
+    end
+
     def add_gateway(gateway_type, credentials = {})
       body = add_gateway_body(gateway_type, credentials)
       xml_doc = ssl_post(add_gateway_url, body, headers)
@@ -103,7 +107,7 @@ module Spreedly
     end
 
     def add_credit_card(options)
-      api_post(add_payment_method_url, add_credit_card_body(options))
+      api_post(add_payment_method_url, add_credit_card_body(options), false)
     end
 
     def update_credit_card(credit_card_token, options)
@@ -174,8 +178,8 @@ module Spreedly
       build_xml_request('payment_method') do |doc|
         add_to_doc(doc, options, :data, :retained, :email)
         doc.credit_card do
-          add_to_doc(doc, options, :number, :month, :first_name, :last_name, :year,
-                     :address1, :address2, :city, :state, :zip, :country, :phone_number)
+          add_to_doc(doc, options, :number, :verification_value, :month, :first_name, :last_name,
+                     :year, :address1, :address2, :city, :state, :zip, :country, :phone_number)
         end
       end
     end
@@ -206,8 +210,8 @@ module Spreedly
       builder.to_xml
     end
 
-    def api_post(url, body)
-      xml_doc = ssl_post(url, body, headers)
+    def api_post(url, body, talking_to_gateway = true)
+      xml_doc = ssl_post(url, body, headers, talking_to_gateway)
       Transaction.new_from(xml_doc)
     end
 

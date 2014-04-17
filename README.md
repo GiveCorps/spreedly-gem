@@ -140,6 +140,13 @@ transaction = env.retain_payment_method(payment_method_token)
 transaction = env.redact_payment_method(payment_method_token)
 ```
 
+#### Redact a gateway
+
+``` ruby
+transaction = env.redact_gateway(gateway_token)
+```
+
+
 #### Currencies
 When you instantiate an environment, you can specify a default currency code like so:
 
@@ -227,7 +234,7 @@ transaction.order_id      # => '30-9904-31114'
 #### Retrieving the transcript for a transaction
 
 ``` ruby
-env.find_transaction_transcript(transaction_token)
+env.find_transcript(transaction_token)
 ```
 
 #### Updating a credit card
@@ -286,6 +293,14 @@ transaction = env.add_credit_card(options)
 
 transaction.card.last_name      # => "Smedry"
 
+```
+
+#### Getting meta information about the supported gateways
+
+You can get the full list of supported gateways like so:
+
+``` ruby
+env.gateway_options
 ```
 
 
@@ -358,6 +373,8 @@ handle the case of Spreedly itself not responding.  Here's an example:
 ``` ruby
 env.purchase_on_gateway(gateway_token, payment_method_token, 802) # Raises Spreedly::TimeoutError
 ```
+
+For api calls that actually talk to a payment gateway, the timout is longer since some gateways can take longer to respond when under load.
 
 ## Sample applications using the gem
 
