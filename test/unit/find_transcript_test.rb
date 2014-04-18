@@ -9,7 +9,7 @@ class FindTranscriptTest < Test::Unit::TestCase
     @environment = Spreedly::Environment.new("key", "secret")
   end
 
-  def test_successful_find_transaction_transcript
+  def test_successful_find_transcript
     t = find_using(successful_get_transcript_response)
 
     assert_kind_of(String, t)
